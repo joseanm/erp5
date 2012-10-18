@@ -25,7 +25,6 @@
 #
 ##############################################################################
 
-from Products.ERP5Type.tests.ERP5TypeTestCase import  _getConversionServerDict
 from Products.ERP5Type.tests.Sequence import SequenceList
 from Products.ERP5Configurator.tests.ConfiguratorTestMixin import \
                                              TestLiveConfiguratorWorkflowMixin
@@ -105,7 +104,8 @@ class TestUNGConfiguratorWorkflowMixin(TestLiveConfiguratorWorkflowMixin):
   """
 
   def getBusinessTemplateList(self):
-    return ('erp5_core_proxy_field_legacy',
+    return ('erp5_promise',
+        'erp5_core_proxy_field_legacy',
         'erp5_full_text_myisam_catalog',
         'erp5_base',
         'erp5_workflow',
@@ -216,15 +216,6 @@ class TestUNGConfiguratorWorkflowMixin(TestLiveConfiguratorWorkflowMixin):
     """ Check the installation form """
     response_dict = sequence.get("response_dict")
     self.assertEquals('show', response_dict['command'])
-
-  def stepCheckSystemPreferenceAfterInstallation(self, sequence=None, sequence_list=None, **kw):
-    """ Check System Preference"""
-    system_preference = self.portal.portal_catalog.getResultValue(portal_type="System Preference")
-    conversion_dict = _getConversionServerDict()
-    self.assertEquals(system_preference.getPreferredOoodocServerPortNumber(),
-                      conversion_dict['port'])
-    self.assertEquals(system_preference.getPreferredOoodocServerAddress(),
-                      conversion_dict['hostname'])
 
   def stepCheckUserPreferenceAfterInstallation(self, sequence=None, sequence_list=None, **kw):
     """ Check System Preference"""

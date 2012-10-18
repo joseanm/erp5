@@ -28,7 +28,6 @@
 
 from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
 from Products.ERP5Type.tests.utils import FileUpload
-from Products.ERP5Type.tests.ERP5TypeTestCase import  _getConversionServerDict
 from DateTime import DateTime
 import os.path
 import Products.ERP5.tests
@@ -45,7 +44,8 @@ class TestUNG(ERP5TypeTestCase):
     return "UNG Tests"
 
   def getBusinessTemplateList(self):
-    return ('erp5_ingestion_mysql_innodb_catalog',
+    return ('erp5_promise',
+            'erp5_ingestion_mysql_innodb_catalog',
             'erp5_full_text_myisam_catalog',
             'erp5_base',
             'erp5_jquery',
@@ -523,11 +523,7 @@ class TestUNG(ERP5TypeTestCase):
     portal_preferences = portal.portal_preferences
     web_page_module = portal.web_page_module
     portal_contributions = portal.portal_contributions
-    system_preference = portal_preferences.newContent(portal_type='System Preference')
-    conversion_dict = _getConversionServerDict()
-    system_preference.setPreferredOoodocServerAddress(conversion_dict["hostname"])
-    system_preference.setPreferredOoodocServerPortNumber(conversion_dict["port"])
-    system_preference.enable()
+    self.portal.portal_alarms.promise_conversion_server.solve()
     self.tic()
     document_path, filename = self.getDocumentPath()
     file = FileUpload(document_path, filename)

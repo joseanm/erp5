@@ -33,8 +33,7 @@ import os
 
 
 from Testing import ZopeTestCase
-from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase,\
-                                                       _getConversionServerDict
+from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl import getSecurityManager
 from Products.ERP5Type.tests.Sequence import SequenceList
@@ -79,7 +78,7 @@ class TestBase(ERP5TypeTestCase, ZopeTestCase.Functional):
   def getBusinessTemplateList(self):
     """
     """
-    return ('erp5_base',)
+    return ('erp5_promise', 'erp5_base',)
 
   def login(self):
     uf = self.getPortal().acl_users
@@ -94,7 +93,8 @@ class TestBase(ERP5TypeTestCase, ZopeTestCase.Functional):
     portal_catalog = self.getCatalogTool()
     #portal_catalog.manage_catalogClear()
     self.createCategories()
-    self.setDefaultSitePreference()
+    self.portal.portal_alarms.promise_conversion_server.solve()
+    self.tic()
 
     #Overwrite immediateReindexObject() with a crashing method
     def crashingMethod(self):
@@ -119,15 +119,6 @@ class TestBase(ERP5TypeTestCase, ZopeTestCase.Functional):
       for category_id in category_list:
         o = self.category_tool.group.newContent(portal_type='Category',
                                                 id=category_id)
-
-  def setDefaultSitePreference(self):
-    default_pref = self.portal.portal_preferences.default_site_preference
-    conversion_dict = _getConversionServerDict()
-    default_pref.setPreferredOoodocServerAddress(conversion_dict['hostname'])
-    default_pref.setPreferredOoodocServerPortNumber(conversion_dict['port'])
-    if self.portal.portal_workflow.isTransitionPossible(default_pref, 'enable'):
-      default_pref.enable()
-    return default_pref
 
   def stepRemoveWorkflowsRelated(self, sequence=None, sequence_list=None, 
                                  **kw):

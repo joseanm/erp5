@@ -31,7 +31,6 @@
 
 
 from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
-from Products.ERP5Type.tests.ERP5TypeTestCase import  _getConversionServerDict
 from AccessControl.SecurityManagement import newSecurityManager
 from StringIO import StringIO
 
@@ -39,7 +38,7 @@ class TestFormPrintoutMixin(ERP5TypeTestCase):
   run_all_test = 1
 
   def getBusinessTemplateList(self):
-    return ('erp5_base', 'erp5_ui_test', 'erp5_odt_style')
+    return ('erp5_promise', 'erp5_base', 'erp5_ui_test', 'erp5_odt_style')
 
   def login(self):
     uf = self.getPortal().acl_users
@@ -48,13 +47,7 @@ class TestFormPrintoutMixin(ERP5TypeTestCase):
     newSecurityManager(None, user)
 
   def setSystemPreference(self):
-    default_pref = self.portal.portal_preferences.default_site_preference
-    conversion_dict = _getConversionServerDict()
-    default_pref.setPreferredOoodocServerAddress(conversion_dict['hostname'])
-    default_pref.setPreferredOoodocServerPortNumber(conversion_dict['port'])
-    #default_pref.setPreferredConversionCacheFactory('document_cache_factory')
-    if default_pref.getPreferenceState() != 'global':
-      default_pref.enable()
+    self.portal.portal_alarms.promise_conversion_server.solve()
 
   def _validate(self, odf_file_data):
     error_list = self.validator.validate(odf_file_data)

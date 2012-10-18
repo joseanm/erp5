@@ -34,7 +34,6 @@ from Testing import ZopeTestCase
 from AccessControl.SecurityManagement import newSecurityManager
 from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
 from Products.ERP5Type.tests.ERP5TypeTestCase import install_product_quiet
-from Products.ERP5Type.tests.ERP5TypeTestCase import _getConversionServerDict
 from Products.ERP5Type.tests.Sequence import SequenceList
 from Products.ERP5OOo.OOoUtils import OOoParser
 from Products.ERP5Form.PreferenceTool import Priority
@@ -67,13 +66,10 @@ class TestOOoImportMixin(ERP5TypeTestCase):
       Initialize the ERP5 site.
     """
     self.login()
-    self.pref = self.portal.portal_preferences.newContent(
-                          portal_type='System Preference')
-    conversion_dict = _getConversionServerDict()
-    self.pref.setPreferredOoodocServerAddress(conversion_dict['hostname'])
-    self.pref.setPreferredOoodocServerPortNumber(conversion_dict['port'])
+    self.portal.portal_alarms.promise_conversion_server.solve()
+    self.tic()
+    self.pref = self.portal.portal_preferences.getActiveSystemPreference()
     self.pref.setPriority(Priority.SITE)
-    self.pref.enable()
 
     # create browser_id_manager
     if not "browser_id_manager" in self.portal.objectIds():
@@ -136,7 +132,7 @@ class TestOOoImport(TestOOoImportMixin):
     """
       Return the list of required business templates.
     """
-    return ('erp5_base', 'erp5_ooo_import')
+    return ('erp5_promise', 'erp5_base', 'erp5_ooo_import')
 
   ##################################
   ##  Basic steps

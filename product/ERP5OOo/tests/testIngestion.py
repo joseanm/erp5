@@ -85,7 +85,7 @@ class TestIngestion(ERP5TypeTestCase):
     """
       Return the list of required business templates.
     """
-    return ('erp5_core_proxy_field_legacy', 'erp5_base',
+    return ('erp5_core_proxy_field_legacy', 'erp5_promise', 'erp5_base',
             'erp5_ingestion', 'erp5_ingestion_mysql_innodb_catalog',
             'erp5_web', 'erp5_crm', 'erp5_dms')
 
@@ -141,14 +141,11 @@ class TestIngestion(ERP5TypeTestCase):
     self.commit()
 
   def setSystemPreference(self):
-    default_pref = self.portal.portal_preferences.default_site_preference
-    conversion_dict = _getConversionServerDict()
-    default_pref.setPreferredOoodocServerAddress(conversion_dict['hostname'])
-    default_pref.setPreferredOoodocServerPortNumber(conversion_dict['port'])
+    self.portal.portal_alarms.promise_conversion_server.solve()
+    self.tic()
+    default_pref = self.portal.portal_preferences.getActiveSystemPreference()
     default_pref.setPreferredDocumentFilenameRegularExpression(FILENAME_REGULAR_EXPRESSION)
     default_pref.setPreferredDocumentReferenceRegularExpression(REFERENCE_REGULAR_EXPRESSION)
-    if default_pref.getPreferenceState() != 'global':
-      default_pref.enable()
 
   def setSimulatedNotificationScript(self, sequence=None, sequence_list=None, **kw):
     """

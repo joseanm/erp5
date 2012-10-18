@@ -31,8 +31,7 @@ import os
 
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.ERP5Type.tests.utils import FileUpload
-from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase,\
-                                                       _getConversionServerDict
+from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
 from Products.ERP5OOo.tests.testIngestion import FILENAME_REGULAR_EXPRESSION
 from Products.ERP5OOo.tests.testIngestion import REFERENCE_REGULAR_EXPRESSION
 from Products.ERP5Type.tests.backportUnittest import expectedFailure
@@ -81,7 +80,8 @@ class TestCRM(BaseTestCRM):
     return "CRM"
 
   def getBusinessTemplateList(self):
-    return ('erp5_full_text_myisam_catalog',
+    return ('erp5_promise',
+            'erp5_full_text_myisam_catalog',
             'erp5_core_proxy_field_legacy',
             'erp5_base',
             'erp5_ingestion',
@@ -436,7 +436,8 @@ class TestCRMMailIngestion(BaseTestCRM):
 
   def getBusinessTemplateList(self):
     # Mail Ingestion must work with CRM alone.
-    return ('erp5_core_proxy_field_legacy',
+    return ('erp5_promise',
+            'erp5_core_proxy_field_legacy',
             'erp5_full_text_myisam_catalog',
             'erp5_base',
             'erp5_ingestion',
@@ -802,7 +803,8 @@ class TestCRMMailSend(BaseTestCRM):
   def getBusinessTemplateList(self):
     # In this test, We will attach some document portal types in event.
     # So we add DMS and Web.
-    return ('erp5_base',
+    return ('erp5_promise',
+            'erp5_base',
             'erp5_ingestion',
             'erp5_ingestion_mysql_innodb_catalog',
             'erp5_crm',
@@ -835,14 +837,12 @@ class TestCRMMailSend(BaseTestCRM):
             default_email_text='me@erp5.org')
 
     # set preference
-    default_pref = self.portal.portal_preferences.default_site_preference
-    conversion_dict = _getConversionServerDict()
-    default_pref.setPreferredOoodocServerAddress(conversion_dict['hostname'])
-    default_pref.setPreferredOoodocServerPortNumber(conversion_dict['port'])
+    self.portal.portal_alarms.promise_conversion_server.solve()
+    self.tic()
+
+    default_pref = self.portal.portal_preferences.getActiveSystemPreference()
     default_pref.setPreferredDocumentFilenameRegularExpression(FILENAME_REGULAR_EXPRESSION)
     default_pref.setPreferredDocumentReferenceRegularExpression(REFERENCE_REGULAR_EXPRESSION)
-    if default_pref.getPreferenceState() == 'disabled':
-      default_pref.enable()
 
     # make sure customers are available to catalog
     self.tic()

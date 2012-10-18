@@ -332,6 +332,7 @@ class ERP5TypeFunctionalTestCase(ERP5TypeTestCase):
                                 self.portal, self.run_only, self.use_phanthom)
 
   def setSystemPreference(self):
+    # Use erp5_promise instead.
     conversion_dict = _getConversionServerDict()
     self.portal.Zuite_setPreference(
        working_copy_list=bt5_dir_list,

@@ -53,7 +53,6 @@ from cgi import FieldStorage
 import ZPublisher.HTTPRequest
 from Testing import ZopeTestCase
 from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
-from Products.ERP5Type.tests.ERP5TypeTestCase import  _getConversionServerDict
 from Products.ERP5Type.tests.utils import FileUpload
 from Products.ERP5Type.tests.utils import DummyLocalizer
 from Products.ERP5OOo.OOoUtils import OOoBuilder
@@ -117,16 +116,12 @@ class TestDocumentMixin(ERP5TypeTestCase):
     self.tic()
     self.login()
 
-  def setDefaultSitePreference(self):
-    default_pref = self.portal.portal_preferences.default_site_preference
-    conversion_dict = _getConversionServerDict()
-    default_pref.setPreferredOoodocServerAddress(conversion_dict['hostname'])
-    default_pref.setPreferredOoodocServerPortNumber(conversion_dict['port'])
+  def setSystemPreference(self):
+    self.portal.portal_alarms.promise_conversion_server.solve()
+    self.tic()
+    default_pref = self.portal.portal_preferences.getActiveSystemPreference()
     default_pref.setPreferredDocumentFilenameRegularExpression(FILENAME_REGULAR_EXPRESSION)
     default_pref.setPreferredDocumentReferenceRegularExpression(REFERENCE_REGULAR_EXPRESSION)
-    if self.portal.portal_workflow.isTransitionPossible(default_pref, 'enable'):
-      default_pref.enable()
-    return default_pref
 
   def setSystemPreference(self):
     portal_type = 'System Preference'

@@ -28,8 +28,7 @@
 ##############################################################################
 
 import unittest
-from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase, \
-     _getConversionServerDict
+from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
 from Products.ERP5Form.Selection import Selection
 from Testing import ZopeTestCase
 from Products.ERP5OOo.tests.utils import Validator
@@ -46,14 +45,14 @@ class TestOOoStyle(ERP5TypeTestCase, ZopeTestCase.Functional):
   content_type = None
 
   def getBusinessTemplateList(self):
-    return ('erp5_core_proxy_field_legacy',
+    return ('erp5_core_proxy_field_legacy', 'erp5_promise',
             'erp5_base', 'erp5_ods_style', 'erp5_odt_style',)
 
   def afterSetUp(self):
     if not self.skin:
       raise NotImplementedError('Subclasses must define skin')
 
-    self.setDefaultSitePreference()
+    self.portal.portal_alarms.promise_conversion_server.solve()
 
     gender = self.portal.portal_categories.gender
     if 'male' not in gender.objectIds():
@@ -84,15 +83,6 @@ class TestOOoStyle(ERP5TypeTestCase, ZopeTestCase.Functional):
     # make sure selections are empty
     self.portal.portal_selections.setSelectionFor(
                         'person_module_selection', Selection())
-
-  def setDefaultSitePreference(self):
-    default_pref = self.portal.portal_preferences.default_site_preference
-    conversion_dict = _getConversionServerDict()
-    default_pref.setPreferredOoodocServerAddress(conversion_dict['hostname'])
-    default_pref.setPreferredOoodocServerPortNumber(conversion_dict['port'])
-    if self.portal.portal_workflow.isTransitionPossible(default_pref, 'enable'):
-      default_pref.enable()
-    return default_pref
 
   def publish(self, *args, **kw):
     kw['handle_errors'] = not debug

@@ -32,7 +32,6 @@ import unittest
 
 from Testing import ZopeTestCase
 from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
-from Products.ERP5Type.tests.ERP5TypeTestCase import _getPersistentMemcachedServerDict, _getVolatileMemcachedServerDict
 from Products.ERP5Type.CachePlugins.DummyCache import DummyCache
 from AccessControl.SecurityManagement import newSecurityManager
 from Products.ERP5Type.Cache import CachingMethod
@@ -62,13 +61,16 @@ class TestCacheTool(ERP5TypeTestCase):
       """
         Return the list of business templates.
       """
-      return ('erp5_base',)
+      return ('erp5_promise', 'erp5_base',)
 
   def afterSetUp(self):
     self.login()
     self.checkCacheTool()
     self.checkPortalTypes()
-    self.createPersistentMemcachedPlugin()
+    # Configure Memcache and persistent cache (kumofs)
+    self.portal.portal_alarms.promise_memcached_server.solve()
+    self.portal.portal_alarms.promise_kumofs_server.solve()
+    self.tic()
     self.createCacheFactories()
     self.createCachedMethod()
     self.commit()
@@ -94,25 +96,6 @@ class TestCacheTool(ERP5TypeTestCase):
     for typeinfo_name in typeinfo_names:
       portal_type = getattr(portal_types, typeinfo_name, None)
       self.assertNotEqual(None, portal_type)
-
-  def createPersistentMemcachedPlugin(self):
-    portal_memcached = self.getPortal().portal_memcached
-    connection_dict = _getVolatileMemcachedServerDict()
-    url_string = '%(hostname)s:%(port)s' % connection_dict    
-    # setup default volatile distributed memcached
-    portal_memcached.default_memcached_plugin.setUrlString(url_string)
-   
-    # setup persistent memcached
-    memcached_plugin_id = 'flare'
-    if getattr(portal_memcached, memcached_plugin_id, None) is None:
-      connection_dict = _getPersistentMemcachedServerDict()
-      url_string = '%(hostname)s:%(port)s' % connection_dict 
-      portal_memcached.newContent(portal_type='Memcached Plugin',
-                                  id=memcached_plugin_id,
-                                  url_string=url_string,
-                                  server_max_key_length=0,
-                                  server_max_value_length=0,
-                                  priority=1)
 
   def createCacheFactories(self):
     portal = self.getPortal()
@@ -154,8 +137,8 @@ class TestCacheTool(ERP5TypeTestCase):
                                       container=portal_caches,
                                       cache_duration=self.cache_duration)
       dram_cache_plugin = dram_cache_factory.newContent(
-                                           portal_type="Distributed Ram Cache",
-                                           specialise='portal_memcached/flare')
+                           portal_type="Distributed Ram Cache",
+                           specialise='portal_memcached/persistent_memcached_plugin')
       dram_cache_plugin.setIntIndex(0)
 
     if getattr(portal_caches, 'erp5_user_factory', None) is None:

@@ -30,9 +30,9 @@
 
 from DateTime import DateTime
 from AccessControl import Unauthorized
-from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
+from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase, \
+                              _getConversionServerDict
 from Products.ERP5Type.tests.SecurityTestCase import SecurityTestCase
-from Products.ERP5Type.tests.ERP5TypeTestCase import  _getConversionServerDict
 from AccessControl.SecurityManagement import newSecurityManager
 
 class TestLiveConfiguratorWorkflowMixin(SecurityTestCase):
@@ -85,7 +85,8 @@ class TestLiveConfiguratorWorkflowMixin(SecurityTestCase):
                          'erp5_ooo_import')
 
   def getBusinessTemplateList(self):
-    return ('erp5_core_proxy_field_legacy',
+    return ('erp5_promise',
+        'erp5_core_proxy_field_legacy',
         'erp5_full_text_myisam_catalog',
         'erp5_base',
         'erp5_workflow',
@@ -119,23 +120,8 @@ class TestLiveConfiguratorWorkflowMixin(SecurityTestCase):
     # it is required by SecurityTestCase
     self.workflow_tool = self.portal.portal_workflow
     self.setDefaultSitePreference()
-    self.setSystemPreference()
+    self.portal.portal_alarms.promise_conversion_server.solve()
     self.portal.portal_activities.unsubscribe()
-
-  def setSystemPreference(self):
-    portal_type = 'System Preference'
-    preference_list = self.portal.portal_preferences.contentValues(
-                                                       portal_type=portal_type)
-    if not preference_list:
-      preference = self.portal.portal_preferences.newContent(
-                                                       portal_type=portal_type)
-    else:
-      preference = preference_list[0]
-    conversion_dict = _getConversionServerDict()
-    preference.setPreferredOoodocServerAddress(conversion_dict['hostname'])
-    preference.setPreferredOoodocServerPortNumber(conversion_dict['port'])
-    if self.portal.portal_workflow.isTransitionPossible(preference, 'enable'):
-      preference.enable()
 
   def setDefaultSitePreference(self):
     default_pref = self.portal.portal_preferences.default_site_preference
@@ -159,6 +145,14 @@ class TestLiveConfiguratorWorkflowMixin(SecurityTestCase):
       (step_title, server_response))
 
   ### STEPS
+  def stepCheckSystemPreferenceAfterInstallation(self, sequence=None, sequence_list=None, **kw):
+    """ Check System Preference"""
+    system_preference = self.portal.portal_preferences.getActiveSystemPreference()
+    conversion_dict = _getConversionServerDict()
+    self.assertEquals(system_preference.getPreferredOoodocServerPortNumber(),
+                      conversion_dict['port'])
+    self.assertEquals(system_preference.getPreferredOoodocServerAddress(),
+                      conversion_dict['hostname'])
 
   def stepCleanUpRequest(self, sequence=None, sequence_list=None, **kw):
     """ Restore clean up the request """

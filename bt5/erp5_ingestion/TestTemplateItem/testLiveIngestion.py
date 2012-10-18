@@ -30,7 +30,6 @@
 import unittest
 import os
 
-from Products.ERP5Type.tests.ERP5TypeTestCase import _getConversionServerDict
 from Products.ERP5Type.tests.ERP5TypeLiveTestCase import ERP5TypeLiveTestCase
 from zLOG import LOG, INFO, ERROR
 from Products.CMFCore.utils import getToolByName
@@ -58,7 +57,8 @@ class TestIngestion(ERP5TypeLiveTestCase):
     """
       Return the list of required business templates.
     """
-    return ('erp5_base',
+    return ('erp5_promise',
+            'erp5_base',
             'erp5_ingestion',
             'erp5_ingestion_mysql_innodb_catalog',
             'erp5_web',
@@ -87,15 +87,11 @@ class TestIngestion(ERP5TypeLiveTestCase):
     self.tic()
 
   def setSystemPreference(self):
-    portal_preferences = getToolByName(self.portal, 'portal_preferences')
-    default_pref = portal_preferences.default_site_preference
-    conversion_dict = _getConversionServerDict()
-    default_pref.setPreferredOoodocServerAddress(conversion_dict['hostname'])
-    default_pref.setPreferredOoodocServerPortNumber(conversion_dict['port'])
-    default_pref.setPreferredDocumentFileNameRegularExpression(FILE_NAME_REGULAR_EXPRESSION)
+    self.portal.portal_alarms.promise_conversion_server.solve()
+    self.tic()
+    default_pref = self.portal.portal_preferences.getActiveSystemPreference()
+    default_pref.setPreferredDocumentFilenameRegularExpression(FILENAME_REGULAR_EXPRESSION)
     default_pref.setPreferredDocumentReferenceRegularExpression(REFERENCE_REGULAR_EXPRESSION)
-    if default_pref.getPreferenceState() != 'global':
-      default_pref.enable()
 
   def contributeFileWithUrl(self, script_id, filename=None):
     """compute url and call portal_contributions.newContentFromUrl
