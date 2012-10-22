@@ -71,8 +71,10 @@ class TestTemplateTool(ERP5TypeTestCase):
   def beforeTearDown(self):
     self.tic()
     mark_replaced_bt_list = ["erp5_odt_style", "erp5_pdm", 'erp5_accounting',
-           'erp5_workflow', 'erp5_configurator', 'erp5_configurator_ung',
-           'erp5_ingestion_mysql_innodb_catalog', "erp5_configurator_standard"]
+                             'erp5_workflow', 'erp5_configurator', 
+                             'erp5_ingestion_mysql_innodb_catalog', 
+                             "erp5_configurator_standard"]
+
     for bt_name in mark_replaced_bt_list:
       bt = self.templates_tool.getInstalledBusinessTemplate(bt_name)
       if (bt is not None) and bt.getInstallationState() in ['installed',
@@ -564,7 +566,7 @@ class TestTemplateTool(ERP5TypeTestCase):
   def test_installBusinessTemplatesFromRepository_install_dependency(self):
     """ Test if update catalog is trigger when needed.
     """
-    bt5_name_list = ['erp5_configurator_ung', 'erp5_configurator_standard']
+    bt5_name_list = ['erp5_configurator_standard']
     template_tool = self.portal.portal_templates
     for repos in template_tool.getRepositoryList():
       if "bootstrap" not in repos:

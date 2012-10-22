@@ -1,3 +1,12 @@
+2012-10-22 Rafael
+* Merged maxma_demo, run_my_docs and ung into workflow standard.
+
+2011-11-14 Xavier
+* Initial commit of run_my_docs workflow
+
+2011-08-04 Gabriel L. Oliveira
+* Fix proxy of transition's scripts
+
 2011-04-12 lucas
 * Added default image on default_standard_configuration and a better description.
 
@@ -46,6 +55,18 @@
 
 2011-03-30 lucas
 * Updated default_accounts_express.ods with Russian accounts information. (Thanks to Vera Kurpas.)
+
+2011-03-29 Gabriel
+* Add unit test to UNG Configurator
+
+2010-03-28 rafael
+* Initial Release of Maxma Demo
+
+2011-03-28 Gabriel
+* Add script to configure UNG Web Site
+
+2011-03-24 Gabriel
+* Initial commit of ung workflow
 
 2010-01-07 lucas
 * Merged with consulting workflow.
