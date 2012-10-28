@@ -92,6 +92,7 @@ def makeFileUpload(name, as_name=None):
 class TestDocumentMixin(ERP5TypeTestCase):
   
   business_template_list = ['erp5_core_proxy_field_legacy',
+                            'erp5_promise',
                             'erp5_jquery',
                             'erp5_full_text_myisam_catalog',
                             'erp5_base',
@@ -111,7 +112,6 @@ class TestDocumentMixin(ERP5TypeTestCase):
 
   def afterSetUp(self):
     TestDocumentMixin.login(self)
-    self.setDefaultSitePreference()
     self.setSystemPreference()
     self.tic()
     self.login()
@@ -122,21 +122,7 @@ class TestDocumentMixin(ERP5TypeTestCase):
     default_pref = self.portal.portal_preferences.getActiveSystemPreference()
     default_pref.setPreferredDocumentFilenameRegularExpression(FILENAME_REGULAR_EXPRESSION)
     default_pref.setPreferredDocumentReferenceRegularExpression(REFERENCE_REGULAR_EXPRESSION)
-
-  def setSystemPreference(self):
-    portal_type = 'System Preference'
-    preference_list = self.portal.portal_preferences.contentValues(
-                                                       portal_type=portal_type)
-    if not preference_list:
-      preference = self.portal.portal_preferences.newContent(title="Default System Preference",
-                                                             # use local RAM based cache as some tests need it
-                                                             preferred_conversion_cache_factory = 'erp5_content_long',
-                                                             portal_type=portal_type)
-    else:
-      preference = preference_list[0]
-    if self.portal.portal_workflow.isTransitionPossible(preference, 'enable'):
-      preference.enable()
-    return preference
+    default_pref.edit(preferred_conversion_cache_factory='erp5_content_long')
 
   def getDocumentModule(self):
     return getattr(self.getPortal(),'document_module')
