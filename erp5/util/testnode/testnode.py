@@ -213,7 +213,7 @@ branch = %(branch)s
      test_result.addWatch(log_file_name,log_file,max_history_bytes=10000)
      return log_file_name
 
-  def checkRevision(self, test_result, node_test_suite, vcs_repository_list):
+  def checkRevision(self, portal, test_result, node_test_suite, vcs_repository_list):
     config = self.config
     log = self.log
     process_manager = self.process_manager
@@ -230,8 +230,20 @@ branch = %(branch)s
       updater = Updater(repository_path, git_binary=config['git_binary'],
                         revision=revision, log=log,
                         process_manager=process_manager)
-      updater.checkout()
-      node_test_suite.revision = test_result.revision
+      if updater.checkout() is not -1:
+        node_test_suite.revision = test_result.revision
+      else:
+        test_result.reportFailure(
+              command={},
+              stdout={},
+              stderr={},
+            )
+        test_result = portal.createTestResult(node_test_suite.revision, [],
+                     config['test_node_title'], False,
+                     node_test_suite.test_suite_title,
+                     node_test_suite.project_title)
+        if test_result is None:
+          raise SubprocessError
 
   def prepareSlapOSForTestSuite(self,node_test_suite):
     config = self.config
@@ -349,7 +361,7 @@ branch = %(branch)s
             log("testnode, test_result : %r" % (test_result, ))
             if test_result is not None:
               log_file_name = self.addWatcher(test_result)
-              self.checkRevision(test_result,node_test_suite,vcs_repository_list)
+              self.checkRevision(portal,test_result,node_test_suite,vcs_repository_list)
               # Now prepare the installation of SlapOS and create instance
               status_dict = self.prepareSlapOSForTestSuite(node_test_suite)
               # Give some time so computer partitions may start
