@@ -1349,7 +1349,7 @@ class TestDocument(TestDocumentMixin):
     self.tic()
     self.assertEquals('converted', document.getExternalProcessingState())
 
-  def test_Base_createNewFile(self):
+  def test_Base_contribute(self):
     """
       Test contributing a file and attaching it to context.
     """
@@ -1374,7 +1374,7 @@ class TestDocument(TestDocumentMixin):
     self.assertEquals('title', document.getTitle())
     self.assertEquals(contributed_document, document)
 
-  def test_Base_createNewFile_empty(self):
+  def test_Base_contribute_empty(self):
     """
       Test contributing an empty file and attaching it to context.
     """
@@ -1402,7 +1402,7 @@ class TestDocument(TestDocumentMixin):
     self.assertEquals('File', document.getPortalType())
     self.assertEquals(contributed_document, document)
 
-  def test_Base_createNewFile_forced_type(self):
+  def test_Base_contribute_forced_type(self):
     """Test contributing while forcing the portal type.
     """
     person = self.portal.person_module.newContent(portal_type='Person')
@@ -1410,6 +1410,27 @@ class TestDocument(TestDocumentMixin):
                                      portal_type='PDF',
                                      file=makeFileUpload('TEST-en-002.odt'))
     self.assertEquals('PDF', contributed_document.getPortalType())
+
+  def test_Base_contribute_input_parameter_dict(self):
+    """Test contributing while entering input parameters.
+    """
+    person = self.portal.person_module.newContent(portal_type='Person')
+    contributed_document = person.Base_contribute(
+                                     title='user supplied title',
+                                     file=makeFileUpload('TEST-en-002.pdf'))
+    self.tic()
+    self.assertEquals('user supplied title', contributed_document.getTitle())
+
+  def test_Base_contribute_input_parameter_dict_request(self):
+    """Test contributing while entering input parameters through the dialog.
+    """
+    person = self.portal.person_module.newContent(portal_type='Person')
+    self.portal.REQUEST.form['title'] = 'user supplied title'
+    contributed_document = person.Base_contribute(
+                                     file=makeFileUpload('TEST-en-002.pdf'))
+    self.tic()
+    self.assertEquals('user supplied title', contributed_document.getTitle())
+
 
   def test_HTML_to_ODT_conversion_keep_enconding(self):
     """This test perform an PDF conversion of HTML content

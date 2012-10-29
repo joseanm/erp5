@@ -50,48 +50,27 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string># Render a "normal" form or an OOo template in an activity and send it by email\n
-from Products.ERP5Type.Message import translateString\n
-portal = context.getPortalObject()\n
-request = portal.REQUEST\n
-request.form.update(request_form)\n
-\n
-if skin_name and skin_name != \'None\': # make_query serializes None as \'None\'\n
-  portal.portal_skins.changeSkin(skin_name)\n
-\n
-report_data = getattr(context, deferred_style_dialog_method)(**params)\n
-\n
-attachment_name = [x[len(\' filename=\'):] for x in (request.RESPONSE.getHeader(\n
-                        \'content-disposition\') or \'\').split(\';\')\n
-                      if x.startswith(\' filename=\')][0]\n
-if attachment_name.startswith(\'"\'):\n
-  attachment_name = attachment_name[1:]\n
-if attachment_name.endswith(\'"\'):\n
-  attachment_name = attachment_name[:-1]\n
-attachment_list = (\n
-  {\'mime_type\': (request.RESPONSE.getHeader(\'content-type\') or \'application/octet-stream;\').split(\';\')[0],\n
-   \'content\': \'%s\' % report_data,\n
-   \'name\': attachment_name},)\n
-\n
-# XXX Use notification message to improve message content\n
-portal.portal_notifications.sendMessage(\n
-  recipient=user_name,\n
-  subject=str(attachment_name.rsplit(\'.\', 1)[0]),\n
-  message=str(translateString(\'Your report is attached.\\n\')),\n
-  message_text_format=\'text/plain\',\n
-  notifier_list=(\'Mail Message\',),\n
-  store_as_event=False,\n
-  attachment_list=attachment_list,\n
-  )\n
+            <value> <string>"""\n
+  This script gets list of Discussion Thread for a Forum using catalog. \n
+  Due to asynchronous nature of catalog it can use\n
+  passed from REQUEST not index yet threads.\n
+"""\n
+thread_relative_url = context.REQUEST.get(\'thread_relative_url\')\n
+discussion_thread_list = [x.getObject() for x  in context.getDocumentValueList(**kw)]\n
+if thread_relative_url is not None:\n
+  thread = context.restrictedTraverse(thread_relative_url)\n
+  if thread is not None and thread not in discussion_thread_list:\n
+    discussion_thread_list = [thread] + discussion_thread_list\n
+return discussion_thread_list\n
 </string> </value>
         </item>
         <item>
             <key> <string>_params</string> </key>
-            <value> <string>localizer_language, skin_name, request_form, deferred_style_dialog_method, user_name, params</string> </value>
+            <value> <string>**kw</string> </value>
         </item>
         <item>
             <key> <string>id</string> </key>
-            <value> <string>Base_renderSimpleView</string> </value>
+            <value> <string>WebSection_getDiscussionThreadList</string> </value>
         </item>
       </dictionary>
     </pickle>
