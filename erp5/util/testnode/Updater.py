@@ -138,7 +138,11 @@ class Updater(object):
           # ctime, so at least for buildout (local download), we need to
           # refresh index first.
           self._git('update-index', '--refresh')
-          self._git('reset', '--merge', h)
+          # Deal with git push --force
+          try:
+            self._git('reset', '--merge', h)
+          except SubprocessError:
+            return -1
       else:
         self.deletePycFiles('.')
         if os.path.exists('.git/svn'):
