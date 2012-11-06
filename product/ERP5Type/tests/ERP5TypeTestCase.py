@@ -950,11 +950,10 @@ class ERP5TypeCommandLineTestCase(ERP5TypeTestCaseMixin):
       """
       return ()
 
-    def loadPromise(self):
+    def _loadPromise(self):
       """ Create promise configuration file and load it into configuration
       """
       promise_path = os.path.join(instancehome, "promise.cfg")
-      ZopeTestCase._print('Adding Promise at %s...\n' % promise_path)
       _createTestPromiseConfigurationFile(promise_path)
       config.product_config["/%s" % self.getPortalName()] = \
          {"promise_path": promise_path}
@@ -1119,8 +1118,8 @@ class ERP5TypeCommandLineTestCase(ERP5TypeTestCaseMixin):
               self._setUpDummyMailHost()
               self.serverhost, self.serverport = self.startZServer(verbose=True)
               self._registerNode(distributing=1, processing=1)
-              self.loadPromise()
 
+            self._loadPromise()
             self._updateConnectionStrings()
             self._recreateCatalog()
             self._installBusinessTemplateList(business_template_list,
