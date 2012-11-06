@@ -43,7 +43,6 @@ class TestWebCrawler(ERP5TypeTestCase):
   """
 
   _path_to_delete_list = []
-  system_pref_id = 'my_preference'
 
   def getTitle(self):
     """
@@ -266,7 +265,7 @@ class TestWebCrawler(ERP5TypeTestCase):
     self.assertFalse(len(new_web_crawler))
 
     # set another namespace on preference
-    preference = self.portal.portal_preferences[self.system_pref_id]
+    preference = self.portal.portal_preferences.getActiveSystemPreference()
     preference.setPreferredIngestionNamespace('NEW')
     self.tic()
     new_web_crawler.crawlContent()

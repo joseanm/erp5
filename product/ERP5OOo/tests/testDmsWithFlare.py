@@ -42,18 +42,18 @@ class TestDocumentWithFlare(TestDocument):
     return "DMS with Flare"
 
   def setSystemPreference(self):
-    system_preference = TestDocument.setSystemPreference(self)
-    memcached = _getPersistentMemcachedServerDict()
+    TestDocument.setSystemPreference(self)
+    system_preference =self.portal.portal_preferences.getActiveSystemPreference()
     system_preference.setPreferredConversionCacheFactory('dms_cache_factory')
+
+    memcached = _getPersistentMemcachedServerDict()
     persistent_memcached_plugin = self.portal.portal_memcached.persistent_memcached_plugin
     persistent_memcached_plugin.setUrlString('%s:%s' %(memcached['hostname'], memcached['port']))
     self.portal.portal_caches.dms_cache_factory.persistent_cache_plugin.setSpecialiseValue(persistent_memcached_plugin)
-
 
 def test_suite():
   suite = unittest.TestSuite()
   suite.addTest(unittest.makeSuite(TestDocumentWithFlare))
   return suite
-
 
 # vim: syntax=python shiftwidth=2 
