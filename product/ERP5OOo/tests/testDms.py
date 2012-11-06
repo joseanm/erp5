@@ -123,7 +123,7 @@ class TestDocumentMixin(ERP5TypeTestCase):
     default_pref.setPreferredDocumentFilenameRegularExpression(FILENAME_REGULAR_EXPRESSION)
     default_pref.setPreferredDocumentReferenceRegularExpression(REFERENCE_REGULAR_EXPRESSION)
     default_pref.edit(preferred_conversion_cache_factory='erp5_content_long')
-
+    
   def getDocumentModule(self):
     return getattr(self.getPortal(),'document_module')
 

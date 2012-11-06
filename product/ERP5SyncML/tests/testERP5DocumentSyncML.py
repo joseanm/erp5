@@ -117,7 +117,8 @@ class TestERP5DocumentSyncMLMixin(TestERP5SyncMLMixin):
     """
       Return the list of business templates.
     """
-    return ('erp5_base',
+    return ('erp5_promise',
+            'erp5_base',
             'erp5_syncml',
             'erp5_ingestion',
             'erp5_ingestion_mysql_innodb_catalog',
