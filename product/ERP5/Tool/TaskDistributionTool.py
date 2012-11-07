@@ -251,7 +251,8 @@ class TaskDistributionTool(BaseTool):
       if node.getSimulationState() != 'failed':
         break
     else:
-      test_result.fail()
+      if test_result.getSimulationState() not in ('failed', 'cancelled'):
+        test_result.fail()
 
   security.declarePublic('reportTaskStatus')
   def reportTaskStatus(self, test_result_path, status_dict, node_title):
@@ -275,3 +276,12 @@ class TaskDistributionTool(BaseTool):
     portal = self.getPortalObject()
     test_result = portal.restrictedTraverse(test_result_path)
     return test_result.getSimulationState() == "started" and 1 or 0
+
+  security.declareObjectProtected(Permissions.AccessContentsInformation)
+  def getMemcachedDict(self):
+    """ Return a dictionary used for non persistent data related to distribution
+    """
+    portal = self.getPortalObject()
+    memcached_dict = portal.portal_memcached.getMemcachedDict(
+                            "task_distribution", "default_memcached_plugin")
+    return memcached_dict
