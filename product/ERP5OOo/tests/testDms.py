@@ -124,6 +124,13 @@ class TestDocumentMixin(ERP5TypeTestCase):
     default_pref.setPreferredDocumentReferenceRegularExpression(REFERENCE_REGULAR_EXPRESSION)
     default_pref.edit(preferred_conversion_cache_factory='erp5_content_long')
     
+    if getattr(self.portal.portal_caches, 'test_cache_factory', None) is None:
+      # create a Cache Factory for tests
+      cache_factory = self.portal.portal_caches.newContent(portal_type = 'Cache Factory', id='test_cache_factory')
+      cache_factory.cache_duration = 36000
+      cache_plugin = cache_factory.newContent(portal_type='Ram Cache')
+      cache_plugin.cache_expire_check_interval = 54000
+
   def getDocumentModule(self):
     return getattr(self.getPortal(),'document_module')
 
@@ -1330,7 +1337,7 @@ class TestDocument(TestDocumentMixin):
     self.tic()
     self.assertEquals('converted', document.getExternalProcessingState())
 
-  def test_Base_createNewFile(self):
+  def test_Base_contribute(self):
     """
       Test contributing a file and attaching it to context.
     """
@@ -1355,7 +1362,7 @@ class TestDocument(TestDocumentMixin):
     self.assertEquals('title', document.getTitle())
     self.assertEquals(contributed_document, document)
 
-  def test_Base_createNewFile_empty(self):
+  def test_Base_contribute_empty(self):
     """
       Test contributing an empty file and attaching it to context.
     """
@@ -1383,7 +1390,7 @@ class TestDocument(TestDocumentMixin):
     self.assertEquals('File', document.getPortalType())
     self.assertEquals(contributed_document, document)
 
-  def test_Base_createNewFile_forced_type(self):
+  def test_Base_contribute_forced_type(self):
     """Test contributing while forcing the portal type.
     """
     person = self.portal.person_module.newContent(portal_type='Person')
@@ -1391,6 +1398,16 @@ class TestDocument(TestDocumentMixin):
                                      portal_type='PDF',
                                      file=makeFileUpload('TEST-en-002.odt'))
     self.assertEquals('PDF', contributed_document.getPortalType())
+
+  def test_Base_contribute_input_parameter_dict(self):
+    """Test contributing while entering input parameters.
+    """
+    person = self.portal.person_module.newContent(portal_type='Person')
+    contributed_document = person.Base_contribute(
+                                     title='user supplied title',
+                                     file=makeFileUpload('TEST-en-002.pdf'))
+    self.tic()
+    self.assertEquals('user supplied title', contributed_document.getTitle())
 
   def test_HTML_to_ODT_conversion_keep_enconding(self):
     """This test perform an PDF conversion of HTML content
