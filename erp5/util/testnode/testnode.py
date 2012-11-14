@@ -212,7 +212,7 @@ branch = %(branch)s
                         process_manager=self.process_manager)
       updater.checkout()
       node_test_suite.revision = test_result.revision
-
+   
   def _prepareSlapOS(self, working_directory, slapos_instance,
           create_partition=1, software_path_list=None, **kw):
     """
