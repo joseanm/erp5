@@ -57,6 +57,7 @@
             <value>
               <list>
                 <string>_set.*</string>
+                <string>manage_beforeDelete</string>
               </list>
             </value>
         </item>

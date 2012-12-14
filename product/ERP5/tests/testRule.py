@@ -26,7 +26,6 @@
 ##############################################################################
 
 import unittest
-from Products.ERP5Type.tests.backportUnittest import expectedFailure
 from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
 from Products.ERP5Type.tests.utils import createZODBPythonScript
 from Products.ERP5.tests.testOrder import TestOrderMixin
@@ -693,7 +692,6 @@ return context.generatePredicate(
     self.assertEqual([], sm.getDeliveryValue().getDeliveryRelatedList())
     return root_applied_rule
 
-  @expectedFailure
   def test_13_unlinkSimulation(self):
     """
     When a root delivery line is deleted, the related simulation movement

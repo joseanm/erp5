@@ -526,7 +526,7 @@ class SimulationMovement(PropertyRecordableMixin, Movement, ExplainableMixin):
     see AppliedRule._isTreeDelivered
     """
     def getTreeDelivered():
-      if self.getDeliveryList():
+      if self.getDeliveryValue() is not None:
         return True
       for applied_rule in self.objectValues():
         if applied_rule._isTreeDelivered():
