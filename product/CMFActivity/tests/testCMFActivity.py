@@ -3423,12 +3423,21 @@ class TestCMFActivity(ERP5TypeTestCase, LogInterceptor):
         obj2.activate(**activity_kw).dummy(2, y=None)
         self.commit()
         activity_tool.distribute()
+        # This activity must not be distributed until the two firsts are
+        # executed for test to pass.
+        obj2.activate(**activity_kw).dummy(3, z=None)
+        self.commit()
+        activity_tool.distribute()
         activity_tool.tic()
         self.assertEqual(group_method_call_list.pop(),
                          sorted([(obj1.getPath(), (1,), dict(x=None)),
                                  (obj2.getPath(), (2,), dict(y=None))]))
         self.assertFalse(group_method_call_list)
         self.assertFalse(activity_tool.getMessageList())
+        activity_tool.distribute()
+        activity_tool.tic()
+        self.assertEqual(group_method_call_list.pop(),
+                         sorted([(obj2.getPath(), (3,), dict(z=None))]))
         obj1.activate(priority=2, **activity_kw).dummy1(1, x=None)
         obj1.activate(priority=1, **activity_kw).dummy2(2, y=None)
         message1 = obj1.getPath(), (1,), dict(x=None)
